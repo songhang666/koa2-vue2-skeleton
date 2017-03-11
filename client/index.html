@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>vue-skeleton</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+<script type="text/javascript">
+  function creatXhr(){
+    if(typeof XMLHttpRequest!='undefined'){
+      return new XMLHttpRequest();
+    }else if(typeof ActiveXObject!='undefined'){
+      var strList=['MSXML.XMLHttp6.0','MSXML.XMLHttp3.0','MSXML.XMLHttp'];
+      var tmp="";
+      for(var n in strList){
+        try{
+          new ActiveXObject(strList[n]);
+          tmp=strList[n];
+          break;
+        }catch(e){
+          console.log(e);
+        }
+      }
+      if(tmp==""){
+        console.log("您的浏览器目前不支持ajax请求");
+      }else{
+        return new ActiveXObject(tmp);
+      }
+    }else{
+      console.log("您的浏览器目前不支持ajax请求");
+    }
+  }
+
+
+
+  //封装公共请求函数(类型，url，是否异步，数据,回调函数)
+  /*type:get/post
+   url:请求路径
+   isSyn:true 异步  false同步
+   callback 回调函数*/
+  function sendRequest(type,url,isSyn,data,callback){
+    var xhr=creatXhr();
+    xhr.onreadystatechange=function(){
+      if(xhr.status=='200'||xhr.status=='304'){
+        if(xhr.readyState=='4'){
+          callback&&callback(JSON.parse(xhr.responseText))
+        }
+      }
+    }
+    if(type=='get'){
+      url=url+"?"
+      for(var n in data){
+        url+=(n+'='+data[n]+'&');
+      }
+      url=url.substr(0,url.length-1);
+    }else{
+      data=JSON.stringify(data)
+    }
+    xhr.open(type,url,isSyn);
+    xhr.send(type=="get"?null:data);
+  }
+  sendRequest('get','http://127.0.0.1:3001/api/users',true,'',function (result) {
+    console.log(result, '------------');
+
+  })
+</script>
+</html>
